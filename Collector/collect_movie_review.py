@@ -63,16 +63,34 @@ review_html = driver.page_source
 doc = BeautifulSoup(review_html, "html.parser")
 review_list = doc.select("ul.list_comment div.cmt_info")
 
-for review_box in review_list:
+empty_cnt = 0
+empty_list = []
+for count, review_box in enumerate(review_list):
+    if len(review_box.select("p.desc_txt")) == 0:
+        empty_cnt +=1
+        empty_list.append(i+1)
+    else:
+        review = review_box.select("p.desc_txt")[0].text.strip()
     score = review_box.select("div.ratings")[0].text
-    writer = review_box.select("span")[0].text
-    temp=writer.find(",")
+    # writer = review_box.select("span")[0].text
+    # temp=writer.find(",")   writer[6:temp]
+    writer = review_box.select("a.link_nick > span")[1].text
     review_date = review_box.select("span.txt_date")[0].text
-    review = review_box.select("p.desc_txt")[0].text
 
+
+    print(f"=========={count+1}번째 리뷰==========" )
     print(f" - 평점 : {score}")
-    print(f" - 작성자 : {writer[6:temp]}")
+    print(f" - 작성자 : {writer}")
     print(f" - 작성일자 : {review_date[:-6]}")
     print(f" -----리뷰-----\n{review}")
-    print("-"*100)
-    #
+
+    #Report
+    print("#"*30)
+    print(f"MOVIE TITLE : {title}")
+    print("#"*30)
+    print(f" - Total Review : {total_review}")
+    print(f" - Empty Review : {empty_cnt}")
+    if len(empty_list)>0:
+        print(f"   + {empty_list}")
+    print(f" - Reviews Collected : {total_review - empty_cnt}")
+    print("#"*30)
